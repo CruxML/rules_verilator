@@ -82,6 +82,7 @@ def _verilator_cc_library(ctx):
 
     # Get the depset correspond to all the Verilog source files
     srcs = ctx.attr.module[VerilogModuleInfo].files if ctx.attr.module else depset()
+    data_files = ctx.attr.module[VerilogModuleInfo].data_files if ctx.attr.module else depset()
 
     # Merge with the files from srcs, hdrs, and deps, plus transitive dependencies
     # Code taken from https://github.com/bazelbuild/bazel/issues/5817#issuecomment-496910826
@@ -119,10 +120,15 @@ def _verilator_cc_library(ctx):
         args.add("--trace")
     args.add_all(srcs)
     args.add_all(ctx.attr.vopts, expand_directories = False)
+
+    verilator_inputs = depset(
+        transitive = [srcs, data_files],
+    )
+
     ctx.actions.run(
         arguments = [args],
         executable = verilator_toolchain.verilator_executable,
-        inputs = srcs,
+        inputs = verilator_inputs,
         outputs = [verilator_output],
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
     )
