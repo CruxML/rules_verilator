@@ -1,4 +1,5 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "git_repository", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load(
     "@rules_verilator//verilator/internal:versions.bzl",
     _DEFAULT_VERSION = "DEFAULT_VERSION",
