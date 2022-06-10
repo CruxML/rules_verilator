@@ -1,4 +1,4 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "git_repository", "http_archive")
 load(
     "@rules_verilator//verilator/internal:versions.bzl",
     _DEFAULT_VERSION = "DEFAULT_VERSION",
@@ -70,11 +70,10 @@ def rules_verilator_dependencies(version = _DEFAULT_VERSION):
         sha256 = "6ee9b396f450ca9753c3283944f9a6015b61227f8386893fb59d593455141481",
     )
     _maybe(
-        http_archive,
+        git_repository,
         name = "rules_verilog",
-        urls = ["https://github.com/agoessling/rules_verilog/archive/v0.1.0.zip"],
-        strip_prefix = "rules_verilog-0.1.0",
-        sha256 = "401b3f591f296f6fd2f6656f01afc1f93111e10b81b9a9d291f9c04b3e4a3e8b",
+        commit = "1919cc8c08ed0e93ed1d2d8094a83153ce704c0d",
+        remote = "https://github.com/CruxML/rules_verilog.git",
     )
 
 def rules_verilator_toolchains(version = _DEFAULT_VERSION):
