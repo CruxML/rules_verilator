@@ -82,7 +82,7 @@ def _verilator_cc_library(ctx):
 
     # Get the depset correspond to all the Verilog source files
     srcs = ctx.attr.module[VerilogModuleInfo].files if ctx.attr.module else depset()
-    data_files = ctx.attr.module[VerilogModuleInfo].data_files if ctx.attr.module else depset()
+    data_runfiles = ctx.runfiles(files = ctx.attr.module[VerilogModuleInfo].data_files.to_list())
 
     # Merge with the files from srcs, hdrs, and deps, plus transitive dependencies
     # Code taken from https://github.com/bazelbuild/bazel/issues/5817#issuecomment-496910826
@@ -121,14 +121,10 @@ def _verilator_cc_library(ctx):
     args.add_all(srcs)
     args.add_all(ctx.attr.vopts, expand_directories = False)
 
-    verilator_inputs = depset(
-        transitive = [srcs, data_files],
-    )
-
     ctx.actions.run(
         arguments = [args],
         executable = verilator_toolchain.verilator_executable,
-        inputs = verilator_inputs,
+        inputs = srcs,
         outputs = [verilator_output],
         progress_message = "[Verilator] Compiling {}".format(ctx.label),
     )
@@ -160,14 +156,17 @@ def _verilator_cc_library(ctx):
     #if ctx.attr.sysc:
     #    deps.append(ctx.attr._systemc)
 
-    return cc_compile_and_link_static_library(
+    ret_val = cc_compile_and_link_static_library(
         ctx,
         srcs = srcs,
         hdrs = hdrs,
         defines = defines,
         includes = [verilator_output_hpp.path],
         deps = deps,
+        runfiles = data_runfiles,
     )
+    print(ret_val)
+    return ret_val
 
 verilator_cc_library = rule(
     _verilator_cc_library,
